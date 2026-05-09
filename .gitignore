@@ -1,0 +1,17 @@
+# Node.js
+migirlsimulation/node_modules/
+migirlsimulation/out/
+migirlsimulation/dist-release/
+migirlsimulation/electron_error.log
+migirlsimulation/electron_out.log
+
+# Python
+omnivoice/venv/
+omnivoice/__pycache__/
+omnivoice/*.egg-info/
+omnivoice/.venv/
+omnivoice/omnivoice_game_refs/
+
+# OS/Misc
+.DS_Store
+Thumbs.db

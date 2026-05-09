@@ -1,0 +1,79 @@
+# OmniVoice 사용법 요약
+
+OmniVoice는 600개 이상의 언어를 지원하는 최첨단 제로샷 TTS(Text-to-Speech) 모델입니다. 사용을 위한 핵심 방법을 정리했습니다.
+
+---
+
+## 1. 빠른 데모 실행 (Web UI)
+가장 간편하게 테스트를 해보려면 터미널에 아래 명령을 실행하여 로컬 브라우저용 데모를 띄웁니다.
+```bash
+omnivoice-demo --ip 0.0.0.0 --port 8001
+
+python -m omnivoice.demo --ip 0.0.0.0 --port 8001
+
+```
+
+## 2. Python 코드를 이용한 구성 (Python API)
+
+먼저 스크립트 상에서 모델을 로드합니다.
+```python
+from omnivoice import OmniVoice
+import soundfile as sf
+import torch
+
+model = OmniVoice.from_pretrained(
+    "k2-fsa/OmniVoice",
+    device_map="cuda:0", # (Apple Silicon Mac 사용자의 경우 "mps"로 변경)
+    dtype=torch.float16
+)
+```
+
+### 1) 음성 복제 (Voice Cloning)
+짧은(3~10초) 타깃 목소리 오디오를 바탕으로 똑같은 목소리로 말하는 생성형 음성을 만듭니다.
+```python
+audio = model.generate(
+    text="생성하고자 하는 텍스트 내용입니다.",
+    ref_audio="ref.wav", # 복제하고자 하는 원본 목소리 오디오 파일
+    # ref_text="레퍼런스 오디오의 스크립트" (생략할 경우 Whisper가 오디오에서 자동 추출시도)
+)
+sf.write("out.wav", audio[0], 24000) # 결과물을 wav 확장자로 저장 (sampling rate: 24kHz)
+```
+
+### 2) 원하는 목소리 특징 조합 생성 (Voice Design)
+원본 오디오 파일 없이, 원하는 목소리의 특징을 지시하여 생성합니다.
+(지원 속성: 성별(male/female), 연령, 피치(high/low), 억양 등)
+```python
+audio = model.generate(
+    text="특징을 부여해서 목소리를 생성합니다.",
+    instruct="female, low pitch, british accent" # 여성, 낮은 음역대, 영국식 억양
+)
+sf.write("out.wav", audio[0], 24000)
+```
+
+### 3) 특수 제어 기능
+- **비언어적 기호 (감정 효과 등):** 텍스트 중간에 `[laughter]`, `[sigh]` 등을 넣어서 표출. (ex: "[laughter] 정말 웃기네요.")
+- **지정 발음 교정:** 영어의 경우 `[B EY1 S]`와 같이 CMU 발음 기호를 넣어 특정 텍스트 구간의 명확한 발음을 지시 가능합니다.
+
+---
+
+## 3. 커맨드라인 (CLI) 도구 활용
+Python 코드 작성 없이 터미널 모드에서 바로 결과물을 생성할 때 유용합니다.
+
+* **음성 복제:**
+  ```bash
+  omnivoice-infer --model k2-fsa/OmniVoice --text "안녕하세요 TTS 테스트입니다." --ref_audio ref.wav --output hello.wav
+  ```
+* **목소리 디자인 생성:**
+  ```bash
+  omnivoice-infer --model k2-fsa/OmniVoice --text "안녕하세요 TTS 테스트입니다." --instruct "male, british accent" --output hello.wav
+  ```
+* **대량 일괄 생성 (배치 처리):**
+  여러 리스트를 `test.jsonl`에 작성해두고 다중 GPU로 한번에 빠르게 생성할 수 있습니다.
+  ```bash
+  omnivoice-infer-batch --model k2-fsa/OmniVoice --test_list test.jsonl --res_dir results/
+  ```
+
+---
+
+## 설치 참고 (현재 환경 기준)
+- 이미 `omnivoice` 프로젝트가 클론된 디렉토리 내에 있으므로, 터미널에서 `uv sync`를 실행하면 필요한 패키지 환경을 올바르게 설치 및 동기화할 수 있습니다.

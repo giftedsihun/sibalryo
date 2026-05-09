@@ -1,0 +1,41 @@
+appId: "com.yourvoice.game"
+productName: "너의 목소리로"
+copyright: "Copyright © 2026"
+
+directories:
+  output: dist-release
+  buildResources: build
+
+files:
+  - out/**/*
+  - "!node_modules"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "너의 목소리로"
+
+extraResources:
+  - from: resources/
+    to: resources/
+    filter:
+      - "**/*"
+  - from: ../omnivoice/
+    to: omnivoice/
+    filter:
+      - "**/*"
+      - "!.git"
+      - "!.gitignore"
+      - "!__pycache__"
+
+asar: true
+compression: maximum
