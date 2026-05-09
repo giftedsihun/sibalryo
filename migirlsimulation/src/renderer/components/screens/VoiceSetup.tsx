@@ -17,7 +17,9 @@ const CHARS: { id: VoiceCharId; label: string; emoji: string; desc: string; colo
 async function uploadToProxy(blob: Blob, filename: string): Promise<string> {
   const form = new FormData()
   form.append('audio', blob, filename)
-  const res = await fetch(`${PROXY_BASE}/clone`, { method: 'POST', body: form })
+  const res = await fetch(`${PROXY_BASE}/clone`, { method: 'POST', body: form }).catch(e => {
+    throw new Error('AI 음성 엔진이 로딩 중입니다. 잠시 후(약 30초~1분) 다시 시도해주세요.')
+  })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` })) as { error: string }
     throw new Error(err.error ?? `HTTP ${res.status}`)
