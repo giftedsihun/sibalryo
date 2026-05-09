@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { useGameStore, VoiceCharId } from '../store/gameStore'
 
-const PROXY_BASE = 'http://localhost:8000'
+const PROXY_BASE = 'http://127.0.0.1:8000'
 
 // Web Speech API pitch per character (Korean voice fallback)
 const SPEAKER_PITCH: Record<string, number> = {

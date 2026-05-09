@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore, VoiceCharId } from '../../store/gameStore'
 
-const PROXY_BASE = 'http://localhost:8000'
+const PROXY_BASE = 'http://127.0.0.1:8000'
 const RECORD_SECONDS = 30
 const MIN_DURATION_SEC = 5
 const SUPPORTED_TYPES = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/ogg', 'audio/x-m4a', 'audio/m4a']
