@@ -36,6 +36,7 @@ extraResources:
       - "!.git"
       - "!.gitignore"
       - "!__pycache__"
+      - "!**/__pycache__"
 
 asar: true
 compression: maximum

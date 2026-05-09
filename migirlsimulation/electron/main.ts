@@ -41,16 +41,30 @@ async function startOmniVoice() {
   const isPackaged = app.isPackaged
   let pythonExe = ''
   let scriptPath = ''
+  let sitePackages = ''
+  let hfHome = ''
 
   if (isPackaged) {
     const omnivoiceDir = join(process.resourcesPath, 'omnivoice')
-    pythonExe = join(omnivoiceDir, 'venv', 'Scripts', 'python.exe')
+    // Use the bundled standalone Python (not the venv shim)
+    pythonExe = join(omnivoiceDir, 'python', 'python.exe')
     scriptPath = join(omnivoiceDir, 'game_server.py')
+    sitePackages = join(omnivoiceDir, 'venv', 'Lib', 'site-packages')
+    hfHome = join(omnivoiceDir, 'hf_cache')
   } else {
     // In dev, assuming omnivoice is a sibling to migirlsimulation
     const omnivoiceDir = join(app.getAppPath(), '..', 'omnivoice')
-    pythonExe = join(omnivoiceDir, 'venv', 'Scripts', 'python.exe')
+    pythonExe = join(omnivoiceDir, 'python', 'python.exe')
     scriptPath = join(omnivoiceDir, 'game_server.py')
+    sitePackages = join(omnivoiceDir, 'venv', 'Lib', 'site-packages')
+    hfHome = join(omnivoiceDir, 'hf_cache')
+  }
+
+  const spawnEnv = {
+    ...process.env,
+    PYTHONPATH: sitePackages,
+    HF_HOME: hfHome,
+    PYTHONDONTWRITEBYTECODE: '1',
   }
 
   // Windows hide ensures no console window appears
@@ -58,7 +72,8 @@ async function startOmniVoice() {
     detached: false,
     windowsHide: true,
     stdio: ['ignore', 'pipe', 'pipe'],
-    cwd: require('path').dirname(scriptPath)
+    cwd: require('path').dirname(scriptPath),
+    env: spawnEnv
   })
 
   omniVoiceProcess.stdout?.on('data', (d: Buffer) => console.log('[OmniVoice]', d.toString().trim()))

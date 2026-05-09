@@ -11,6 +11,8 @@ omnivoice/__pycache__/
 omnivoice/*.egg-info/
 omnivoice/.venv/
 omnivoice/omnivoice_game_refs/
+omnivoice/python/
+omnivoice/hf_cache/
 
 # OS/Misc
 .DS_Store
